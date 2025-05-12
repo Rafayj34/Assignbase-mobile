@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { Button, Pressable, Text, View } from "react-native";
@@ -35,8 +35,12 @@ export default function Index() {
          <Pressable onPress={() => router.push({ pathname: "/signin" })}>
           <View className="bg-light-primary dark:bg-primary bg-secondary p-4 rounded-md"> 
             <Text className="text-2xl font-bold text-light-text dark:text-dark-text">Sign In</Text>
+
           </View>
          </Pressable>
+            <Link className="mt-20" href="/(student)/student/dashboard">
+              <Text className="text-2xl font-bold text-light-text dark:text-dark-text">Dashboard</Text>
+            </Link>
         </>
       )}
     </View>
