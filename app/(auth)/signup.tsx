@@ -1,14 +1,14 @@
 import { router } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useColorScheme } from 'nativewind';
 import React, { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { auth } from '../../firebase.config';
 
@@ -18,6 +18,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const { colorScheme } = useColorScheme();
 
   const handleSignUp = async () => {
     setError('');
@@ -43,17 +44,27 @@ export default function SignUp() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      className="flex-1 bg-white dark:bg-dark-background"
     >
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Create Account</Text>
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        {success ? <Text style={styles.success}>{success}</Text> : null}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
+      <View className="flex-1 p-5 justify-center">
+        <Text className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
+          Create Account
+        </Text>
+        {error ? (
+          <Text className="text-red-500 mb-2.5 text-center">{error}</Text>
+        ) : null}
+        {success ? (
+          <Text className="text-green-500 mb-2.5 text-center">{success}</Text>
+        ) : null}
+        
+        <View className="mb-5">
+          <Text className="text-base mb-2 text-gray-800 dark:text-white">
+            Email
+          </Text>
           <TextInput
-            style={styles.input}
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-base bg-gray-50 dark:bg-dark-component text-gray-800 dark:text-white"
             placeholder="Enter your email"
+            placeholderTextColor={colorScheme === 'dark' ? '#9CA3AF' : '#6B7280'}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -62,11 +73,14 @@ export default function SignUp() {
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
+        <View className="mb-5">
+          <Text className="text-base mb-2 text-gray-800 dark:text-white">
+            Password
+          </Text>
           <TextInput
-            style={styles.input}
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-base bg-gray-50 dark:bg-dark-component text-gray-800 dark:text-white"
             placeholder="Create a password"
+            placeholderTextColor={colorScheme === 'dark' ? '#9CA3AF' : '#6B7280'}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -75,11 +89,14 @@ export default function SignUp() {
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Confirm Password</Text>
+        <View className="mb-5">
+          <Text className="text-base mb-2 text-gray-800 dark:text-white">
+            Confirm Password
+          </Text>
           <TextInput
-            style={styles.input}
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-base bg-gray-50 dark:bg-dark-component text-gray-800 dark:text-white"
             placeholder="Confirm your password"
+            placeholderTextColor={colorScheme === 'dark' ? '#9CA3AF' : '#6B7280'}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -88,82 +105,24 @@ export default function SignUp() {
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.buttonText}>Sign Up</Text>
+        <TouchableOpacity 
+          className="bg-blue-500 p-4 rounded-lg items-center mt-2.5"
+          onPress={handleSignUp}
+        >
+          <Text className="text-white text-lg font-semibold">
+            Sign Up
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.linkButton}
-          onPress={() => {router.push('/signin')}}
+          className="mt-5 items-center"
+          onPress={() => router.push('/signin')}
         >
-          <Text style={styles.linkText}>Already have an account? Sign In</Text>
+          <Text className="text-blue-500 text-base">
+            Already have an account? Sign In
+          </Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  formContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
-    color: '#333',
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#333',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  linkButton: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  linkText: {
-    color: '#007AFF',
-    fontSize: 16,
-  },
-  error: {
-    color: 'red',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  success: {
-    color: 'green',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-});

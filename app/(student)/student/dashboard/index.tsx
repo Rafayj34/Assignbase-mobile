@@ -1,7 +1,25 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import Constants from "expo-constants";
 import { useColorScheme } from "nativewind";
 import React, { useState } from "react";
-import { LayoutChangeEvent, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  LayoutChangeEvent,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+// const backendUrl = Constants.expoConfig?.extra?.BACKEND_PUBLIC_URL;
+const backendUrl = Constants.expoConfig?.extra?.BACKEND_PUBLIC_URL;
+
+const getUsers = async () => {
+  // console.log("process.env.BACKEND_PUBLIC_URL", backendUrl);
+  const response = await axios.get(`${backendUrl}/api/users`);
+  return response.data;
+};
 
 // Sample data for projects
 const projectsData = [
@@ -44,8 +62,15 @@ const projectsData = [
 
 const Dashboard = () => {
   const { colorScheme } = useColorScheme();
-  const [rowHeights, setRowHeights] = useState(Array(projectsData.length).fill(0));
-
+  const [rowHeights, setRowHeights] = useState(
+    Array(projectsData.length).fill(0)
+  );
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+    staleTime: 0,
+   });
+  // console.log(users);
   // Handler to update row height when measured
   const onProjectNameLayout = (event: LayoutChangeEvent, idx: number) => {
     const { height } = event.nativeEvent.layout;
@@ -57,7 +82,11 @@ const Dashboard = () => {
   };
 
   return (
-    <ScrollView scrollEnabled className="flex-1 bg-light-background dark:bg-dark-background px-3 text-sm">
+    <ScrollView
+      scrollEnabled
+      className="flex-1 bg-light-background dark:bg-dark-background px-3 text-sm"
+      showsVerticalScrollIndicator={false}
+    >
       <View className="flex-col gap-5">
         {/* Header */}
         <View className="flex-col gap-2">
@@ -263,43 +292,68 @@ const Dashboard = () => {
 
           {/* ----------------------------------------------------------------------------------------------------- */}
         </View>
+
         <View className="flex gap-3 pb-3">
           <Text className="text-light-text dark:text-dark-text text-2xl font-bold">
             Projects List
           </Text>
-          <View style={{ position: 'relative', minHeight: 60 * (projectsData.length + 1) }}>
+          <View
+            style={{
+              position: "relative",
+              minHeight: 60 * (projectsData.length + 1),
+            }}
+          >
             {/* Sticky Project Name Column (Header + Rows) */}
-            <View style={{ position: 'absolute', left: 0, top: 0, zIndex: 10 }}>
+            <View style={{ position: "absolute", left: 0, top: 0, zIndex: 10 }}>
               {/* Header */}
               <View className="w-[200px] bg-light-component dark:bg-dark-component p-4 rounded-tl-lg">
-                <Text className="text-light-text dark:text-dark-text font-bold">Project Name</Text>
+                <Text className="text-light-text dark:text-dark-text font-bold">
+                  Project Name
+                </Text>
               </View>
               {/* Rows */}
               {projectsData.map((item, idx) => (
                 <View
                   key={item.id}
                   className="w-[200px] bg-light-component dark:bg-dark-component p-4 border-t border-gray-200 dark:border-gray-700"
-                  style={{ height: rowHeights[idx] > 0 ? rowHeights[idx] : undefined }}
-                  onLayout={event => onProjectNameLayout(event, idx)}
+                  style={{
+                    height: rowHeights[idx] > 0 ? rowHeights[idx] : undefined,
+                  }}
+                  onLayout={(event) => onProjectNameLayout(event, idx)}
                 >
-                  <Text className="text-light-text dark:text-dark-text">{item.projectName}</Text>
+                  <Text className="text-light-text dark:text-dark-text">
+                    {item.projectName}
+                  </Text>
                 </View>
               ))}
             </View>
 
             {/* Scrollable Table (Headers + Rows) */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingLeft: 200 }}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ paddingLeft: 200 }}
+            >
               <View style={{ width: 600 }}>
                 {/* Header */}
-                <View className="flex-row bg-light-component dark:bg-dark-component p-4 rounded-tr-lg" style={{ minHeight: 28 }}>
+                <View
+                  className="flex-row bg-light-component dark:bg-dark-component p-4 rounded-tr-lg"
+                  style={{ minHeight: 28 }}
+                >
                   <View className="w-[120px]">
-                    <Text className="text-light-text dark:text-dark-text font-bold">Status</Text>
+                    <Text className="text-light-text dark:text-dark-text font-bold">
+                      Status
+                    </Text>
                   </View>
                   <View className="w-[150px]">
-                    <Text className="text-light-text dark:text-dark-text font-bold">Student</Text>
+                    <Text className="text-light-text dark:text-dark-text font-bold">
+                      Student
+                    </Text>
                   </View>
                   <View className="w-[100px]">
-                    <Text className="text-light-text dark:text-dark-text font-bold">Payment</Text>
+                    <Text className="text-light-text dark:text-dark-text font-bold">
+                      Payment
+                    </Text>
                   </View>
                 </View>
                 {/* Rows */}
@@ -307,21 +361,41 @@ const Dashboard = () => {
                   <View
                     key={item.id}
                     className="flex-row bg-light-component dark:bg-dark-component p-4 border-t border-gray-200 dark:border-gray-700 items-center"
-                    style={{ height: rowHeights[idx] > 0 ? rowHeights[idx] : undefined }}
+                    style={{
+                      height: rowHeights[idx] > 0 ? rowHeights[idx] : undefined,
+                    }}
                   >
                     <View className="w-[120px]">
-                      <Text className="text-light-text dark:text-dark-text">{item.jobStatus}</Text>
+                      <Text className="text-light-text dark:text-dark-text">
+                        {item.jobStatus}
+                      </Text>
                     </View>
                     <View className="w-[150px]">
-                      <Text className="text-light-text dark:text-dark-text">{item.studentName}</Text>
+                      <Text className="text-light-text dark:text-dark-text">
+                        {item.studentName}
+                      </Text>
                     </View>
                     <View className="w-[100px]">
-                      <Text className="text-light-text dark:text-dark-text">{item.paymentStatus}</Text>
+                      <Text className="text-light-text dark:text-dark-text">
+                        {item.paymentStatus}
+                      </Text>
                     </View>
                   </View>
                 ))}
               </View>
             </ScrollView>
+
+            <View className="flex-row items-center justify-between">
+              <Text className="text-light-text dark:text-dark-text text-sm">
+                Users Count
+              </Text>
+              <Text className="text-light-text dark:text-dark-text text-sm">
+                {users ? users.length : "Loading..."}
+              </Text>
+            </View>
+            {/* <Text className="text-light-text dark:text-dark-text text-sm">
+              {users?.data.length} adsdas
+            </Text> */}
           </View>
         </View>
       </View>

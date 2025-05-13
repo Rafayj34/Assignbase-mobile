@@ -1,11 +1,14 @@
+import { useAuth } from '@/context/AuthContext';
+import { auth } from '@/firebase.config';
 import { Ionicons } from '@expo/vector-icons';
+import { signOut } from 'firebase/auth';
 import { useColorScheme } from 'nativewind';
 import React from 'react';
-import { Image, Pressable, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, View } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
-
 export default function Navbar() {
   const { colorScheme, toggleColorScheme } = useColorScheme();
+  const { user , loading} = useAuth();
 
   return (
     <View className="pt-1 flex-row items-center justify-between px-4 py-2 bg-light-background dark:bg-dark-background">
@@ -35,6 +38,15 @@ export default function Navbar() {
           <Ionicons name="moon" size={24} color="#4B0082" />
         )}
       </Pressable>
+      {user ? (
+        <Pressable onPress={() => signOut(auth)}>
+          <Ionicons name="log-out" size={24} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+        </Pressable>
+      ) : loading ? (
+        <ActivityIndicator size="large" color={colorScheme === 'dark' ? '#fff' : '#000'} />
+      ) : (
+       <Ionicons name="log-in" size={24} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+      )}
     </View>
   );
 } 

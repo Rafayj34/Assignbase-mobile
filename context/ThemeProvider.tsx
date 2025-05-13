@@ -1,34 +1,61 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { useColorScheme } from 'nativewind';
+import React, { createContext, useContext, useEffect } from 'react';
 
-const ThemeContext = createContext({
+type Theme = 'light' | 'dark';
+
+const THEME_STORAGE_KEY = '@theme_preference';
+
+const ThemeContext = createContext<{
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}>({
   theme: 'light',
-  setTheme: (theme: 'light' | 'dark') => {},
+  setTheme: () => {},
 });
 
+export const useTheme = () => useContext(ThemeContext);
+
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const systemTheme = useColorScheme();
-  const [theme, setTheme] = useState<'light' | 'dark'>(systemTheme || 'light');
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   useEffect(() => {
-    (async () => {
-      const saved = await AsyncStorage.getItem('theme');
-      if (saved === 'light' || saved === 'dark') setTheme(saved);
-    })();
+    const loadTheme = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+        if (stored === 'light' || stored === 'dark') {
+          setColorScheme(stored);
+        }
+      } catch (error) {
+        console.error('Error loading theme:', error);
+      }
+    };
+
+    loadTheme();
   }, []);
 
   useEffect(() => {
-    AsyncStorage.setItem('theme', theme);
-  }, [theme]);
+    const saveTheme = async () => {
+      if (colorScheme) {
+        try {
+          await AsyncStorage.setItem(THEME_STORAGE_KEY, colorScheme);
+        } catch (error) {
+          console.error('Error saving theme:', error);
+        }
+      }
+    };
+
+    saveTheme();
+  }, [colorScheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      <View className={theme === 'dark' ? 'dark flex-1' : 'flex-1'}>
-        {children}
-      </View>
+    <ThemeContext.Provider
+      value={{
+        theme: colorScheme as Theme,
+        setTheme: setColorScheme,
+      }}
+    >
+      {children}
     </ThemeContext.Provider>
   );
 };
-
-export const useTheme = () => useContext(ThemeContext);
